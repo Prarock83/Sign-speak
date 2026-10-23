@@ -8,7 +8,10 @@ export function useSpeech() {
   const [speaking, setSpeaking] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) { setSupported(false); return; }
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      setSupported(false);
+      return;
+    }
     const load = () => {
       const v = window.speechSynthesis.getVoices();
       setVoices(v);
@@ -16,22 +19,33 @@ export function useSpeech() {
     };
     load();
     window.speechSynthesis.addEventListener("voiceschanged", load);
-    return () => { window.speechSynthesis.removeEventListener("voiceschanged", load); window.speechSynthesis.cancel(); };
+    return () => {
+      window.speechSynthesis.removeEventListener("voiceschanged", load);
+      window.speechSynthesis.cancel();
+    };
   }, []);
 
-  const speak = useCallback((text: string) => {
-    if (!supported || !text.trim()) return;
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    const v = voices.find((x) => x.voiceURI === voiceURI);
-    if (v) u.voice = v;
-    u.rate = rate;
-    u.onstart = () => setSpeaking(true);
-    u.onend = u.onerror = () => setSpeaking(false);
-    window.speechSynthesis.speak(u);
-  }, [supported, voices, voiceURI, rate]);
+  const speak = useCallback(
+    (text: string) => {
+      if (!supported || !text.trim()) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      const v = voices.find((x) => x.voiceURI === voiceURI);
+      if (v) u.voice = v;
+      u.rate = rate;
+      u.onstart = () => setSpeaking(true);
+      u.onend = u.onerror = () => setSpeaking(false);
+      window.speechSynthesis.speak(u);
+    },
+    [supported, voices, voiceURI, rate],
+  );
 
-  const stop = useCallback(() => { if (supported) window.speechSynthesis.cancel(); setSpeaking(false); }, [supported]);
+  const stop = useCallback(() => {
+    if (supported) window.speechSynthesis.cancel();
+    setSpeaking(false);
+  }, [supported]);
 
   return { supported, voices, voiceURI, setVoiceURI, rate, setRate, speaking, speak, stop };
 }
+
+export type SpeechController = ReturnType<typeof useSpeech>;

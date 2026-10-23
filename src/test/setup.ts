@@ -1,5 +1,18 @@
 import "@testing-library/jest-dom/vitest";
 
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+if (!("ResizeObserver" in globalThis)) {
+  Object.defineProperty(globalThis, "ResizeObserver", {
+    writable: true,
+    value: ResizeObserverMock,
+  });
+}
+
 Object.defineProperty(window, "scrollTo", {
   writable: true,
   value: () => {},
