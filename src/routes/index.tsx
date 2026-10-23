@@ -85,7 +85,7 @@ function Index() {
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3" aria-label="Main">
           <a href="#" className="flex items-center gap-2.5 font-display text-xl font-bold">
             <span className="grid size-9 place-items-center rounded-xl bg-gradient-brand text-primary-foreground"><Hand className="size-5" aria-hidden /></span>
-            Sign<span className="text-gradient-brand">Speak</span>
+            <span>Sign<span className="text-gradient-brand">Speak</span></span>
           </a>
           <div className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
             <a href="#studio" className="hover:text-foreground">Studio</a>
