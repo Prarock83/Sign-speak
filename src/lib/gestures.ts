@@ -3,7 +3,9 @@
 
 export type Point = { x: number; y: number; z?: number };
 
-export type GestureId = "open_palm" | "fist" | "thumbs_up" | "thumbs_down" | "victory";
+export type GestureId =
+  | "open_palm" | "fist" | "thumbs_up" | "thumbs_down" | "victory"
+  | "i_love_you" | "call_me" | "ok" | "point_up" | "three";
 
 export const GESTURES: Record<GestureId, { name: string; text: string; emoji: string; hint: string }> = {
   open_palm: { name: "Open Palm", text: "Hello", emoji: "🖐️", hint: "All five fingers spread" },
@@ -11,6 +13,11 @@ export const GESTURES: Record<GestureId, { name: string; text: string; emoji: st
   thumbs_up: { name: "Thumbs Up", text: "Yes", emoji: "👍", hint: "Thumb pointing up" },
   thumbs_down: { name: "Thumbs Down", text: "No", emoji: "👎", hint: "Thumb pointing down" },
   victory: { name: "Victory Sign", text: "Thank You", emoji: "✌️", hint: "Index + middle up" },
+  i_love_you: { name: "I Love You", text: "I Love You", emoji: "🤟", hint: "Thumb, index + pinky out" },
+  call_me: { name: "Call Me", text: "Call Me", emoji: "🤙", hint: "Thumb + pinky out" },
+  ok: { name: "OK Sign", text: "Okay", emoji: "👌", hint: "Thumb touches index tip" },
+  point_up: { name: "Point Up", text: "Wait", emoji: "☝️", hint: "Only index finger up" },
+  three: { name: "Three Fingers", text: "Please", emoji: "🖖", hint: "Index, middle + ring up" },
 };
 
 const d = (a?: Point, b?: Point) => (a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0);
@@ -29,9 +36,16 @@ export function classify(raw: Point[]): GestureId | null {
   // Thumb is "out" when its tip is far from the index knuckle relative to palm size.
   const thumbOut = d(lm[4], lm[5]) / palm > 0.55 && d(lm[4], lm[9]) > d(lm[3], lm[9]);
   const allCurled = indexC && middleC && ringC && pinkyC;
+  const pinch = d(lm[4], lm[8]) / palm < 0.3;
 
+  // Order matters: most specific shapes first.
+  if (pinch && middle && ring && pinky) return "ok";
   if (index && middle && ring && pinky && thumbOut) return "open_palm";
+  if (index && pinky && middleC && ringC && thumbOut) return "i_love_you";
+  if (pinky && indexC && middleC && ringC && thumbOut) return "call_me";
+  if (index && middle && ring && pinkyC) return "three";
   if (index && middle && ringC && pinkyC) return "victory";
+  if (index && middleC && ringC && pinkyC && !thumbOut) return "point_up";
   if (allCurled && thumbOut) {
     const dy = (lm[4]!.y - lm[2]!.y) / palm; // image y grows downward
     if (dy < -0.45) return "thumbs_up";
