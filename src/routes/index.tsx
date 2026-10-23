@@ -224,7 +224,7 @@ function Index() {
                   </Select>
                   <div className="flex items-center gap-2">
                     <Label htmlFor="rate" className="whitespace-nowrap text-xs">Rate {speech.rate.toFixed(1)}×</Label>
-                    <Slider id="rate" min={0.5} max={2} step={0.1} value={[speech.rate]} onValueChange={([r]) => speech.setRate(r)} aria-label="Speech rate" />
+                    <Slider id="rate" min={0.5} max={2} step={0.1} value={[speech.rate]} onValueChange={([r]) => speech.setRate(r ?? 1)} aria-label="Speech rate" />
                   </div>
                 </>
               ) : <p className="text-sm text-muted-foreground sm:col-span-3">Speech isn't supported in this browser. Try Chrome, Edge or Safari.</p>}
