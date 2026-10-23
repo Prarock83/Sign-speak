@@ -35,6 +35,9 @@ export function CameraPanel({
   const overlayRef = useRef(true);
   const cbRef = useRef(onGesture);
   cbRef.current = onGesture;
+  const evRef = useRef({ onActiveChange, onLive, onFailure });
+  evRef.current = { onActiveChange, onLive, onFailure };
+  const startingRef = useRef(false);
 
   const [status, setStatus] = useState<Status>("off");
   const [overlay, setOverlay] = useState(true);
@@ -85,6 +88,9 @@ export function CameraPanel({
   }, []);
 
   const start = useCallback(async () => {
+    if (startingRef.current || streamRef.current) return;
+    startingRef.current = true;
+    const { onActiveChange, onLive, onFailure } = evRef.current;
     setError(null);
     setStatus("init");
     if (!navigator.mediaDevices?.getUserMedia) {
@@ -123,8 +129,10 @@ export function CameraPanel({
           ? { title: "No camera found", body: "Connect a webcam and try again, or use the Sample Demo below." }
           : { title: "Couldn't start the camera", body: "Another app may be using it. Close it and try again." });
       stop(); onActiveChange(false);
+    } finally {
+      startingRef.current = false;
     }
-  }, [loop, onActiveChange, onFailure, onLive, stop]);
+  }, [loop, stop]);
 
   useEffect(() => { if (active) void start(); else stop(); }, [active, start, stop]);
   useEffect(() => () => { stop(); landmarkerRef.current?.close(); }, [stop]);
