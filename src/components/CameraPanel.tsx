@@ -14,7 +14,7 @@ const STATUS: Record<Status, { label: string; icon: typeof Camera; cls: string }
   nohand: { label: "No Hand Detected", icon: ScanLine, cls: "bg-warning/15 text-warning" },
 };
 
-const CONNECTIONS = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+const CONNECTIONS: [number, number][] = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
 const VERSION = "1.1.1";
 
 export function CameraPanel({
@@ -59,7 +59,7 @@ export function CameraPanel({
       const res = lmk.detectForVideo(v, performance.now());
       const ctx = c.getContext("2d")!;
       ctx.clearRect(0, 0, c.width, c.height);
-      const hand = res.landmarks?.[0];
+      const hand = res.landmarks?.[0] as { x: number; y: number }[] | undefined;
       if (hand) {
         setStatus("hand");
         if (overlayRef.current) {

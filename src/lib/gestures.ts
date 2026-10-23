@@ -16,8 +16,9 @@ export const GESTURES: Record<GestureId, { name: string; text: string; emoji: st
 const d = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
 /** Returns a gesture id, or null when the hand shape is not reliably one of the vocabulary. */
-export function classify(lm: Point[]): GestureId | null {
-  if (!lm || lm.length < 21) return null;
+export function classify(raw: Point[]): GestureId | null {
+  const lm = raw as Required<Point>[] & Point[];
+  if (!raw || raw.length < 21) return null;
   const wrist = lm[0];
   const palm = d(wrist, lm[9]) || 1e-6; // hand scale
   const ext = (tip: number, pip: number) => d(wrist, lm[tip]) > d(wrist, lm[pip]) * 1.15;
@@ -49,7 +50,7 @@ export class GestureStabilizer {
   private last: GestureId | null | undefined;
   private count = 0;
   private lastEmitted: GestureId | null = null;
-  private lastEmitAt = 0;
+  private lastEmitAt = -Infinity;
   constructor(private need = 10, private cooldownMs = 1200, private repeatMs = 3500) {}
 
   push(g: GestureId | null, now: number): { emit: GestureId | null; consistency: number } {
