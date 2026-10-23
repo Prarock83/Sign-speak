@@ -66,8 +66,8 @@ export function CameraPanel({
           const css = getComputedStyle(document.documentElement);
           ctx.lineWidth = 4; ctx.strokeStyle = css.getPropertyValue("--teal");
           for (const [a, b] of CONNECTIONS) {
-            ctx.beginPath(); ctx.moveTo(hand[a].x * c.width, hand[a].y * c.height);
-            ctx.lineTo(hand[b].x * c.width, hand[b].y * c.height); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(hand[a]!.x * c.width, hand[a]!.y * c.height);
+            ctx.lineTo(hand[b]!.x * c.width, hand[b]!.y * c.height); ctx.stroke();
           }
           ctx.fillStyle = css.getPropertyValue("--primary");
           for (const p of hand) { ctx.beginPath(); ctx.arc(p.x * c.width, p.y * c.height, 6, 0, Math.PI * 2); ctx.fill(); }

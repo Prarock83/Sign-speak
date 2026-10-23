@@ -13,13 +13,13 @@ export const GESTURES: Record<GestureId, { name: string; text: string; emoji: st
   victory: { name: "Victory Sign", text: "Thank You", emoji: "✌️", hint: "Index + middle up" },
 };
 
-const d = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
+const d = (a?: Point, b?: Point) => (a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0);
 
 /** Returns a gesture id, or null when the hand shape is not reliably one of the vocabulary. */
 export function classify(raw: Point[]): GestureId | null {
-  const lm = raw as Required<Point>[] & Point[];
+  const lm = raw as Point[];
   if (!raw || raw.length < 21) return null;
-  const wrist = lm[0];
+  const wrist = lm[0]!;
   const palm = d(wrist, lm[9]) || 1e-6; // hand scale
   const ext = (tip: number, pip: number) => d(wrist, lm[tip]) > d(wrist, lm[pip]) * 1.15;
   const curled = (tip: number, pip: number) => d(wrist, lm[tip]) < d(wrist, lm[pip]) * 1.02;
@@ -33,7 +33,7 @@ export function classify(raw: Point[]): GestureId | null {
   if (index && middle && ring && pinky && thumbOut) return "open_palm";
   if (index && middle && ringC && pinkyC) return "victory";
   if (allCurled && thumbOut) {
-    const dy = (lm[4].y - lm[2].y) / palm; // image y grows downward
+    const dy = (lm[4]!.y - lm[2]!.y) / palm; // image y grows downward
     if (dy < -0.45) return "thumbs_up";
     if (dy > 0.45) return "thumbs_down";
     return null;
